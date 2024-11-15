@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 70px;
+            --topnav-height: 70px;
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-primary: #1f2937;
+            --text-secondary: #64748b;
+            --bg-color: #f8fafc;
+            --border-color: #e2e8f0;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background-color: white;
+            box-shadow: var(--card-shadow);
+            transition: width var(--transition-speed) ease;
+            z-index: 1000;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            height: var(--topnav-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 35px;
+            height: 35px;
+            background-color: var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            transition: opacity var(--transition-speed);
+        }
+
+        .collapsed .sidebar-logo {
+            opacity: 0;
+            width: 0;
+        }
+
+        .nav-section {
+            padding: 1.5rem 0.75rem;
+            flex: 1;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            padding: 0 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .collapsed .nav-section-title {
+            opacity: 0;
+        }
+
+        .nav-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .nav-item {
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            color: var(--text-secondary);
+            transition: all var(--transition-speed);
+            position: relative;
+            margin: 0 0.25rem;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+            width: 2.5rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-item span {
+            transition: opacity var(--transition-speed);
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            background-color: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* .nav-item.active:before {
+            content: '';
+            position: absolute;
+            left: -0.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0.25rem;
+            height: 1.5rem;
+            background-color: var(--primary-color);
+            border-radius: 0 0.25rem 0.25rem 0;
+        } */
+
+        .collapsed .nav-item span {
+            opacity: 0;
+            visibility: hidden;
+            width: 0;
+        }
+
+        .collapsed .nav-item {
+            justify-content: center;
+        }
+
+        .collapsed .nav-item i {
+            margin: 0;
+            width: auto;
+        
+
+        }
+
+        .nav-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Top Navigation Styles */
+        .topnav {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--topnav-height);
+            background-color: white;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--card-shadow);
+            transition: left var(--transition-speed) ease;
+            z-index: 999;
+        }
+
+        .sidebar.collapsed ~ .topnav {
+            left: var(--sidebar-collapsed-width);
+        }
+
+        .menu-toggle {
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            transition: all var(--transition-speed);
+        }
+
+        .menu-toggle:hover {
+            background-color: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 2rem;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            outline: none;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            background-color: #f8fafc;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background-color: white;
+        }
+
+        .topnav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .notification-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            position: relative;
+            transition: all var(--transition-speed);
+            cursor: pointer;
+        }
+
+        .notification-btn:hover {
+            background-color: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        .notification-indicator {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: #ef4444;
+            border-radius: 50%;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .user-profile:hover {
+            background-color: #f1f5f9;
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: calc(var(--topnav-height) + 2rem) 2rem 2rem;
+            transition: margin-left var(--transition-speed) ease;
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.5rem;
+            background-color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+
+        .card-menu {
+            color: var(--text-secondary);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .card-menu:hover {
+            background-color: #f1f5f9;
+            color: var(--text-primary);
+        }
+
+        .stats {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+        }
+
+        .stats-change {
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stats-change.positive {
+            color: #059669;
+            background-color: #ecfdf5;
+        }
+
+        .stats-change.negative {
+            color: #dc2626;
+            background-color: #fef2f2;
+        }
+
+        .stats-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .chart {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f1f5f9 25%, #e2e8f0 25%, #e2e8f0 50%, #f1f5f9 50%, #f1f5f9 75%, #e2e8f0 75%);
+            background-size: 1rem 1rem;
+            border-radius: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+                width: var(--sidebar-width) !important;
+            }
+
+            .sidebar.active .sidebar-logo,
+            .sidebar.active .nav-item span {
+                opacity: 1;
+                visibility: visible;
+                width: auto;
+
+            }
+
+            .topnav {
+                left: 0 !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-bar {
+                display: none;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <div class="sidebar-logo">Analytics</div>
+        </div>
+        
+        <div class="nav-section" style="overflow-y: auto; overflow-x: hidden;">
+            <div class="nav-section-title">Main Menu</div>
+            <div class="nav-items">
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-inbox"></i>
+                    <span>Messages</span>
+                </div>
+                
+            </div>
+            
+            <div class="nav-section-title" style="margin-top: 2rem;">Management</div>
+            <div class="nav-items">
+                <div class="nav-item">
+                    <i class="fas fa-folder"></i>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Schedule</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Reports</span>
+                </div>   <div class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-inbox"></i>
+                    <span>Messages</span>
+                </div>   <div class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-inbox"></i>
+                    <span>Messages</span>
+                    
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-inbox"></i>
+                    <span>Messages</span>
+                    
+                </div>    <div class="nav-item">
+                    <i class="fas fa-inbox"></i>
+                    <span>Messages</span>
+                    
+                </div>    <div class="nav-item">
+                    <i class="fas fa-inbox"></i>
+                    <span>Messages</span>
+                    
+                </div>    <div class="nav-item">
+                    <i class="fas fa-inbox"></i>
+                    <span>Messages</span>
+                    
+                </div>    <div class="nav-item">
+                    <i class="fas fa-inbox"></i>
+                    <span>Messages</span>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-footer">
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Top Navigation -->
+    <nav class="topnav">
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search anything...">
+        </div>
+        <div class="topnav-actions">
+            <div class="notification-btn">
+                <i class="fas fa-bell"></i>
+                <div class="notification-indicator"></div>
+            </div>
+            <div class="user-profile">
+                <div class="user-avatar">JD</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Dashboard Overview</h1>
+            <p class="page-description">Welcome back! Here's what's happening with your projects today.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        Total Revenue
+                    </div>
+                    <div class="card-menu">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
+                </div>
+                <div class="stats">
+                    $45,678
+                    <span class="stats-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        12.5%
+                    </span>
+                </div>
+                <div class="stats-description">Compared to last month</div>
+                <div class="chart"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        Active Users
+                    </div>
+                    <div class="card-menu">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
+                </div>
+                <div class="stats">
+                    1,234
+                    <span class="stats-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        8.2%
+                    </span>
+                </div>
+                <div class="stats-description">Active users this month</div>
+                <div class="chart"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        Conversion Rate
+                    </div>
+                    <div class="card-menu">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
+                </div>
+                <div class="stats">
+                    2.4%
+                    <span class="stats-change negative">
+                        <i class="fas fa-arrow-down"></i>
+                        1.1%
+                    </span>
+                </div>
+                <div class="stats-description">Conversions this month</div>
+                <div class="chart"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Toggle sidebar collapse state
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        let isCollapsed = false;
+
+        menuToggle.addEventListener('click', () => {
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.toggle('active');
+            } else {
+                isCollapsed = !isCollapsed;
+                sidebar.classList.toggle('collapsed', isCollapsed);
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 1024) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Handle navigation items
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                if (window.innerWidth <= 1024) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.remove('collapsed');
+                isCollapsed = false;
+            }
+        });
+    </script>
+</body>
+</html>
