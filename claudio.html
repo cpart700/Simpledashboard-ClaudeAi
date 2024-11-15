@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root {
+            --sidebar-width: 240px;
+            --sidebar-collapsed-width: 64px;
+            --topnav-height: 64px;
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-color: #f9fafb;
+            --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background-color: white;
+            box-shadow: var(--card-shadow);
+            transition: width var(--transition-speed) ease;
+            z-index: 1000;
+            overflow-x: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            height: var(--topnav-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .sidebar-logo {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            white-space: nowrap;
+            transition: opacity var(--transition-speed);
+        }
+
+        .collapsed .sidebar-logo {
+            opacity: 0;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.25rem;
+            margin: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+            transition: all var(--transition-speed);
+            white-space: nowrap;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+            width: 1.5rem;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background-color: #f3f4f6;
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .collapsed .nav-item span {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Top Navigation Styles */
+        .topnav {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--topnav-height);
+            background-color: white;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--card-shadow);
+            transition: left var(--transition-speed) ease;
+            z-index: 999;
+        }
+
+        .sidebar.collapsed ~ .topnav {
+            left: var(--sidebar-collapsed-width);
+        }
+
+        .menu-toggle {
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+            transition: all var(--transition-speed);
+        }
+
+        .menu-toggle:hover {
+            background-color: #f3f4f6;
+            color: var(--text-primary);
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 2rem;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.625rem 1rem 0.625rem 2.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            outline: none;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: calc(var(--topnav-height) + 2rem) 2rem 2rem;
+            transition: margin-left var(--transition-speed) ease;
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .card-header {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .stats {
+            font-size: 1.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .stats-change {
+            font-size: 0.875rem;
+            color: #10b981;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            background-color: #ecfdf5;
+            border-radius: 1rem;
+        }
+
+        .stats-change.negative {
+            color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+        .chart {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to bottom right, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+                width: var(--sidebar-width) !important;
+            }
+
+            .sidebar.active .sidebar-logo,
+            .sidebar.active .nav-item span {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .topnav {
+                left: 0 !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-bar {
+                display: none;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">Analytics</div>
+        </div>
+        <nav>
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Customers</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-inbox"></i>
+                <span>Messages</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-folder"></i>
+                <span>Projects</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Top Navigation -->
+    <nav class="topnav">
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search...">
+        </div>
+        <div class="user-profile">
+            <div class="user-avatar">JD</div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">Total Revenue</div>
+                <div class="stats">
+                    $45,678
+                    <span class="stats-change">+12.5%</span>
+                </div>
+                <div class="chart"></div>
+            </div>
+            <div class="card">
+                <div class="card-header">Active Users</div>
+                <div class="stats">
+                    1,234
+                    <span class="stats-change">+8.2%</span>
+                </div>
+                <div class="chart"></div>
+            </div>
+            <div class="card">
+                <div class="card-header">Conversion Rate</div>
+                <div class="stats">
+                    2.4%
+                    <span class="stats-change negative">-1.1%</span>
+                </div>
+                <div class="chart"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Toggle sidebar collapse state
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        let isCollapsed = false;
+
+        menuToggle.addEventListener('click', () => {
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.toggle('active');
+            } else {
+                isCollapsed = !isCollapsed;
+                sidebar.classList.toggle('collapsed', isCollapsed);
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 1024) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Handle navigation items
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                if (window.innerWidth <= 1024) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.remove('collapsed');
+                isCollapsed = false;
+            }
+        });
+    </script>
+</body>
+</html>
